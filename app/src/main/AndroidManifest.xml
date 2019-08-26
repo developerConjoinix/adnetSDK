@@ -24,7 +24,9 @@
 
         <activity
             android:name="com.conjoinix.adsdk.AdActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+        />
     </application>
 
 </manifest>

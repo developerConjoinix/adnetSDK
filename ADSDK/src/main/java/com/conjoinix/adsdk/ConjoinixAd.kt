@@ -1,12 +1,9 @@
 package com.conjoinix.adsdk
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.google.gson.Gson
 import okhttp3.*
 import okio.Buffer
@@ -20,9 +17,11 @@ import java.io.Serializable
 class ConjoinixAd {
 
 
-    data class Builder(val context: Activity, var adKey: String? = null,
-                       var adUrl: String? = null, var adType: String? = null
-                       , var zoneID: String? = null, var screenType: String? = null) {
+    data class Builder(
+        val context: Activity, var adKey: String? = null,
+        var adUrl: String? = null, var adType: String? = null
+        , var zoneID: String? = null, var screenType: String? = null
+    ) {
 
 
         fun build(onCallBack: (isSuccess: Boolean, msg: String) -> Unit?) {
@@ -43,8 +42,10 @@ class ConjoinixAd {
         fun zoneID(zoneID: String) = apply { this.zoneID = zoneID }
         fun screenType(screenType: String) = apply { this.screenType = screenType }
 
-        fun run(parameters: HashMap<String, String>,
-                onCallBack: (isSuccess: Boolean, msg: String) -> Unit?) {
+        fun run(
+            parameters: HashMap<String, String>,
+            onCallBack: (isSuccess: Boolean, msg: String) -> Unit?
+        ) {
 
             val builder = FormBody.Builder()
             val it = parameters.entries.iterator()
@@ -58,21 +59,23 @@ class ConjoinixAd {
 
             val client = OkHttpClient()
             val request = Request.Builder()
-                    .url(AD_URL)
-                    .post(formBody)
-                    .build()
+                .url(AD_URL)
+                .post(formBody)
+                .build()
 
 
             val buffer = Buffer()
             request.body()?.writeTo(buffer)
 
-            Log.e("Hi post ", buffer.readUtf8())
+            //  Log.e("Hi post ", buffer.readUtf8())
 
             client.newCall(request).enqueue(object : Callback {
 
                 override fun onFailure(call: Call, e: IOException) {
 
-                 onCallBack(false, "onFailure")
+                    context.runOnUiThread {
+                        onCallBack(false, "Ad is failed to load ")
+                    }
 
                 }
 
@@ -88,19 +91,23 @@ class ConjoinixAd {
 
                         if (data.code == 1001) {
                             val bundle = Bundle()
+                            val adInfo = data.data
+                            adInfo?.adID = adKey
+                            Log.e("Hlo Hlo","${adInfo?.adID}")
                             bundle.putSerializable("data", data.data)
                             val intent = Intent(context, AdActivity::class.java)
                             intent.putExtra("Bundle", bundle)
                             context.startActivity(intent)
-                            AdActivity.setUpListener(object : MyListener {
-                                override fun onSuccess() {
-                                    onCallBack(true, data.message)
-                                    Log.e("onSuccess", "DEEPS{AL ")
+                            AdActivity.setUpListener(object : AdActivity.MyListener {
+                                override fun onSuccess(boolean: Boolean) {
+
+                                    onCallBack(boolean, data.message)
+
                                 }
                             })
 
                         } else {
-                            onCallBack(false, data.message)
+                            onCallBack(false, "Ad is failed to load ")
                         }
                     }
 
@@ -121,28 +128,17 @@ const val AD_URL = "http://adnetapi.conjoinix.com/User/"
 const val AD_URL_CLICKED = "http://adnetapi.conjoinix.com/user/adclicked"
 
 data class AdHeader(val code: Int, val message: String, val data: AdResponse? = null)
-data class AdResponse(val logKey: String,
-
-                      val pkgID: String,
-
-                      val maxduration: Int,
-
-                      val minDuration: Int,
-
-                      val adType: String,
-
-                      val adUrl: String,
-
-                      val downloadUrl: String,
-
-                      val allowedDays: String,
-
-                      val screenType: String,
-
-
-                      val saleContact: String,
-
-
-                      val website: String,
-
-                      val clickUrl: String) : Serializable
+data class AdResponse(
+    var adID: String?,//Custom Added key
+    val logKey: String,
+    val pkgID: String,
+    val maxduration: Int,
+    val minDuration: Int,
+    val adType: String,
+    var adUrl: String,
+    val downloadUrl: String,
+    val allowedDays: String,
+    val screenType: String, val saleContact: String,
+    val website: String,
+    val clickUrl: String
+) : Serializable

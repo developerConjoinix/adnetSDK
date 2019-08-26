@@ -2,7 +2,6 @@ package com.conjoinix.adsdk
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.media.Image
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.WindowManager
@@ -10,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_ad.*
-import android.net.Uri.fromParts
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -19,24 +17,40 @@ import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.conjoinix.adsdk.AdActivity.WebViewController
 import android.animation.ObjectAnimator
-import android.widget.ImageView
+import android.content.pm.ActivityInfo
+import android.os.Handler
+import okhttp3.*
+import okio.Buffer
+import java.io.IOException
+import kotlin.math.abs
 
 
 /**
  * Created by deepakkanyan on 2019-08-20 , 14:34.
  */
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-class AdActivity : AppCompatActivity() {
+class AdActivity : AppCompatActivity()  {
+
+    companion object {
+
+        var myListener: MyListener? = null
+
+        fun setUpListener(Listener: MyListener) {
+            myListener = Listener
+        }
+
+
+    }
 
     val IMAGE = "IMAGE"
     val VIDEO = "VIDEO"
-    val WEB = "HTML"
+    val WEB   = "HTML"
 
-
+    interface MyListener {
+        fun onSuccess(boolean: Boolean = true)
+    }
     lateinit var model: AdResponse
-
     var canSkipAd = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,20 +70,27 @@ class AdActivity : AppCompatActivity() {
 
                 fullImageView.show()
                 fullImageView.load(this, model.adUrl)
-
                 fullImageView.setOnClickListener {
                     openUrl(model.clickUrl)
-                }
+                  }
                 startTimer()
-            }
+               }
             VIDEO -> {
+                videoRl.setOnClickListener {
+                    openUrl(model.clickUrl)
+                }
+                videoRl.show()
+                initVideoView()
             }
             WEB -> {
                 web.show()
                 loadWebsite()
                 startTimer()
             }
+
         }
+
+
 
         layout.setOnClickListener {
 
@@ -101,6 +122,8 @@ class AdActivity : AppCompatActivity() {
 
             adCompleted()
         }
+
+
         call.vibrate()
 
 
@@ -108,7 +131,51 @@ class AdActivity : AppCompatActivity() {
     }
 
 
-    fun openUrl(url : String){
+    /**
+     * If ad is video Type
+     * */
+
+    private fun initVideoView() {
+        prograss.show()
+       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+       Handler().postDelayed({
+           videoView.setVideoURI(Uri.parse(model.adUrl))
+
+           videoView.setOnPreparedListener {
+               prograss.hide()
+               startTimer()
+               videoView.start()
+           }
+
+       },100)
+
+
+        videoView.setOnCompletionListener {
+            adCompleted(true)
+            Log.e("videoView 1 ", "setOnCompletionListener")
+        }
+
+
+
+
+
+        videoView.setOnErrorListener {
+            adCompleted(false)
+            false
+        }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+    }
+
+    private fun openUrl(url : String){
+
+        adViewed()
+
         try {
             val myIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(myIntent)
@@ -118,11 +185,45 @@ class AdActivity : AppCompatActivity() {
         }
     }
 
+    private fun adViewed(){
+
+        val param = HashMap<String, String>()
+
+        param["apiKey"] = model.adID!!
+        param["logKey"] = model.logKey
+
+        val builder = FormBody.Builder()
+        val it = param.entries.iterator()
+        while (it.hasNext()) {
+            val pair = it.next() as Map.Entry<*, *>
+            builder.add(pair.key.toString(), pair.value.toString())
+        }
+
+        val formBody = builder.build()
 
 
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(AD_URL_CLICKED)
+            .post(formBody)
+            .build()
 
 
+        val buffer = Buffer()
+        request.body()?.writeTo(buffer)
+        Log.e("Hi post ", buffer.readUtf8())
+        client.newCall(request).enqueue(object : Callback{
+            override fun onFailure(call: Call, e: IOException) {
 
+                Log.e("onFailure" ,"Ad Cliked")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+
+                Log.e("onResponse " ,"Ad Cliked ${response.body()!!.string()}")
+            }
+        })
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun loadWebsite()
@@ -134,24 +235,29 @@ class AdActivity : AppCompatActivity() {
 
     private fun startTimer() {
 
+        val  totalDuration = if(model.adType == VIDEO){
+            videoView.duration
+        }else{
+            model.maxduration.milli().toLong()
+        }
 
-        val totalDuration = model.maxduration.milli().toLong()
+        Log.e("totalDuration ", "$totalDuration")
+
         val minDuration = model.minDuration.milli().toLong()
-        val differenceTime = totalDuration - minDuration
 
 
         val timer = object : CountDownTimer(totalDuration, 1000) {
 
             override fun onTick(click: Long) {
 
-                Log.e("Tick ", "$click  $differenceTime")
-                if (click < differenceTime) {
+
+                if ((totalDuration-click) >= minDuration) {
                     canSkipAd = true
                     textTimer.text = "Skip"
-                     onFinish()
+                    onFinish()
 
                 } else {
-                    textTimer.text = "skip in ${click / 1000}"
+                    textTimer.text = "skip in ${abs(totalDuration - (click + minDuration)) / 1000}"
                 }
 
             }
@@ -166,23 +272,11 @@ class AdActivity : AppCompatActivity() {
 
     }
 
-
-    companion object {
-
-        var myListener: MyListener? = null
-
-        fun setUpListener(Listener: MyListener) {
-            myListener = Listener
-        }
-
-
-    }
-    private fun adCompleted() {
-        myListener!!.onSuccess()
+    private fun adCompleted(boolean: Boolean = true) {
+        myListener!!.onSuccess(boolean)
         finish()
 
     }
-
 
     inner class WebViewController : WebViewClient() {
 
@@ -193,15 +287,6 @@ class AdActivity : AppCompatActivity() {
     }
 
 }
-
-
-
-
-interface MyListener {
-    fun onSuccess()
-}
-
-
 
 
 
@@ -225,10 +310,10 @@ fun View.show(){
 
 }
 
-/*fun View.gone(){
+ fun View.hide(){
     visibility = View.GONE
 
-}*/
+}
 
 fun View.vibrate(){
     val rotate = ObjectAnimator.ofFloat(

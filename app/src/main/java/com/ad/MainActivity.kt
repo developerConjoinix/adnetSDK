@@ -3,10 +3,8 @@ package com.ad
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.conjoinix.adsdk.ConjoinixAd
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,9 +14,11 @@ class MainActivity : AppCompatActivity() {
 
         txt.setOnClickListener {
 
-            ConjoinixAd.Builder(this).adKey("SMARTPARENTAPP2017").build { a, b ->
+            ConjoinixAd.Builder(this)
+                .adKey("Test Key")
+                .build { isSuccess, _ ->
 
-                txt.setText(b)
+                    txt.setText("$isSuccess")
             }
         }
 
@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
 
 fun Log(message: String) {
-
 
     Log.e("hi welcome", "  $message ")
 

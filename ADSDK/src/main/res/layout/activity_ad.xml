@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:background="#ff0077"
+                android:background="#000"
                 android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -19,37 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    <RelativeLayout
 
-
-            android:id="@+id/layout"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="10dp"
-            android:paddingStart="7dp"
-            android:paddingEnd="7dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:minWidth="60dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/circular_background">
-
-
-        <TextView
-                android:paddingStart="1dp"
-                android:paddingEnd="1dp"
-                android:paddingTop="1dp"
-                android:paddingBottom="1dp"
-                android:layout_centerInParent="true"
-                android:textColor="#fff"
-                android:textSize="12sp"
-                 android:layout_gravity="center_vertical"
-                android:text="skip in 1 sec"
-                android:id="@+id/textTimer"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </RelativeLayout>
 
 
     <ImageView
@@ -64,6 +33,29 @@
             android:src="@drawable/ic_close"
             android:layout_height="30dp"/>
 
+    <RelativeLayout
+
+            android:visibility="gone"
+            android:id="@+id/videoRl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <com.devbrackets.android.exomedia.ui.widget.VideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:useDefaultControls="false"/>
+
+
+        <ProgressBar
+                android:id="@+id/prograss"
+                android:layout_centerInParent="true"
+                android:layout_width="20dp" android:layout_height="20dp"
+        />
+    </RelativeLayout>
 
     <androidx.cardview.widget.CardView
             android:id="@+id/call"
@@ -79,12 +71,42 @@
         <androidx.appcompat.widget.AppCompatImageView
                 app:tint="#FFFFFF"
                 android:layout_width="wrap_content"
-                   android:padding="5dp"
-                   android:layout_height="wrap_content"
-                   android:src="@drawable/ic_call"
+                android:padding="5dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_call"
         />
 
     </androidx.cardview.widget.CardView>
+    <RelativeLayout
 
+
+            android:id="@+id/layout"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="20dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:minWidth="60dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circular_background">
+
+
+        <TextView
+                android:paddingStart="1dp"
+                android:paddingEnd="1dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:layout_centerInParent="true"
+                android:textColor="#fff"
+                android:textSize="12sp"
+                android:layout_gravity="center_vertical"
+               android:id="@+id/textTimer"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
 </RelativeLayout>
