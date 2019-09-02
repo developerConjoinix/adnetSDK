@@ -15,11 +15,15 @@ class MainActivity : AppCompatActivity() {
         txt.setOnClickListener {
 
             ConjoinixAd.Builder(this)
-                .adKey("Test Key")
-                .build { isSuccess, _ ->
+                .adKey("1gywg0vz7G")
+                .isBulk("1")
+                .buildBulk { isSuccess, data ->
+                    txt.setText("Done $isSuccess")
+                    print("hii $isSuccess")
+                    print("Data model ${data?.size}")
 
-                    txt.setText("$isSuccess")
-            }
+
+                }
         }
 
 
