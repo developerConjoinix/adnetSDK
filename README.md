@@ -11,7 +11,7 @@
 </pre>
  
 <p><strong>Gradle Configuration:</strong></p>
-<pre class="kode code-toolbar  language-css"><code id="depCodeGradle" class=" kode  language-css"></code>implementation 'com.github.developerConjoinix:adnetSDK:1.0'</pre>
+<pre class="kode code-toolbar  language-css"><code id="depCodeGradle" class=" kode  language-css"></code>implementation 'com.github.developerConjoinix:adnetSDK:1.1'</pre>
 <div class="kode code-toolbar  language-css"><span style="font-family: Verdana, Arial, Helvetica, sans-serif;">Add the following lines in you project level Gradle file</span></div>
 <pre>allprojects { <br />repositories    { <br />maven { <br />url 'https://jitpack.io' <br />     } <br />  }<br />}<br />&nbsp;</pre>
 <p><strong>Thanks and Happy Coding ;)&nbsp;</strong></p>
