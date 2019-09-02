@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.conjoinix.adsdk.ConjoinixAd
+import com.conjoinix.adsdk.show
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -14,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
         txt.setOnClickListener {
 
-            ConjoinixAd.Builder(this)
+           /* ConjoinixAd.Builder(this)
                 .adKey("1gywg0vz7G")
                 .isBulk("1")
                 .buildBulk { isSuccess, data ->
@@ -23,7 +24,16 @@ class MainActivity : AppCompatActivity() {
                     print("Data model ${data?.size}")
 
 
-                }
+                }*/
+
+
+        }
+
+        bannerView.loadAd(this){
+
+            if(it)  {
+                bannerView.show()
+            }
         }
 
 

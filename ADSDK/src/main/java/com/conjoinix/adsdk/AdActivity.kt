@@ -306,7 +306,10 @@ fun Int.milli(): Int {
 
 
 fun View.show(){
-    visibility = View.VISIBLE
+    this.post {
+        visibility = View.VISIBLE
+    }
+
 
 }
 
