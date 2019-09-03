@@ -6,7 +6,7 @@
 <span style="color: #333333;">.zoneID( "0" )&nbsp;&nbsp;</span>
 <span style="color: #333333;">.adType( "SPLASH" )&nbsp;&nbsp;</span>
 <span style="color: #333333;">.screenType( "SPLASH" ) <span style="caret-color: #999999;">&nbsp;</span></span><br /><span style="color: #333333;">.adKey("your_ad_id").</span><span style="color: #333333;">build { isSuccess, message -&gt;</span></pre>
-<p><strong>Banner MultipleAd Configuration:</strong></p>
+<p><strong>Banner Slider MultipleAd with Viewpager Configuration:</strong></p>
 <p>add XML Tag in activity_xml</p>
 <pre>&lt;com.conjoinix.adsdk.BannerView<br />     android:visibility="gone"<br />    android:id="@+id/bannerView"<br />    android:layout_width="match_parent"<br />    app:adKey="app_ad_key"<br />    android:layout_height="200dp"/&gt;<br /><br /><br /></pre>
 <pre>bannerView.loadAd(this){ isLoaded -&gt;<br /><br />    if(isLoaded)  {<br />        bannerView.show()<br />    }}</pre>
